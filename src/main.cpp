@@ -6,6 +6,7 @@
 int main() {
     // Create a window
     sf::RenderWindow window(sf::VideoMode(800, 600), "SFML TEST");
+    sf::CircleShape shape(200);
     
     while (window.isOpen()) {
         sf::Event event;
@@ -15,6 +16,7 @@ int main() {
         }
 
         window.clear();
+        window.draw(shape);
         window.display();
     }
 }

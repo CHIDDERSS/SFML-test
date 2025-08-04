@@ -2,51 +2,124 @@
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include <cmath>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
+const int frames = 30;
+
+// -------------------------------------------------- GAME CLASS --------------------------------------------------
 class Game {
 public:
     Game(const Game&) = delete;
     Game& operator=(const Game&) = delete;
     Game();
-    void run();
+    void run(int frames_per_seconds);
 private:
     void processEvents();
-    void update();
+    void update(sf::Time deltaTime);
     void render();
 
     sf::RenderWindow _window;
     sf::CircleShape _player;
 };
 
-int main(int argc, char* argv[]) {
-    // Create a window
-    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML TEST");
-    sf::Font font;
-    font.loadFromFile("/usr/share/fonts/truetype/msttcorefonts/Arial.ttf");
-    
-    sf::CircleShape circle(150);
-    circle.setFillColor(sf::Color::Blue);
-    circle.setPosition(10, 20);
+// -------------------------------------------------- PLAYER CLASS --------------------------------------------------
+class Player  : public sf::Drawable {
+public:
+    Player(const Player&) = delete;
+    Player& operator = (const Player&) = delete;
+    Player();
 
-    sf::Text text;
-    text.setPosition(100, 100);
-
-    sf::CircleShape shape(150);
-
-    std::string userInput;
-
-    while (window.isOpen()) {
-        sf::Event event;
-
-        while (window.pollEvent(event)) {
-            if ((event.type == sf::Event::Closed) || (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape))
-                window.close();
-        }
-
-        window.clear();
-        window.draw(circle);
-        window.display();
+    template<typename ... Args>
+    void setPosition(Args&& ... args) {
+        _shape.setPosition(std::forward<Args>(args)...);
     }
 
-    return 0;
+    void update(sf::Time deltaTime);
+    bool isMoving;
+    int rotation;
+
+private:
+    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+    sf::RectangleShape _shape;
+    sf::Vector2f _velocity;
+};
+
+// -------------------------------------------------- GAME CONSTRUCTOR --------------------------------------------------
+// constructor
+Game::Game() : _window(sf::VideoMode(800,600), "GAME"), _player(150) {
+    _player.setFillColor(sf::Color::Blue);
+    _player.setPosition(10,20);
+}
+
+// -------------------------------------------------- GAME METHODS -------------------------------------------------- 
+void Game::processEvents() {
+    sf::Event event;    
+    
+    while(_window.pollEvent(event)) {
+        if ((event.type == sf::Event::Closed) || ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))) {
+            _window.close();
+        }
+    }
+}
+
+void Game::update(sf::Time deltaTime) {
+
+};
+
+void Game::render() {
+    _window.clear();
+    _window.draw(_player);
+    _window.display();
+};
+
+void Game::run(int frames_per_second) {
+    sf::Clock clock;
+    sf::Time timeSinceLastUpdate = sf::Time::Zero;
+    sf::Time TimePerFrame = sf::seconds(1.f/frames_per_second);
+
+    while(_window.isOpen()) {
+        processEvents();
+
+        bool repaint = false;
+
+        timeSinceLastUpdate += clock.restart();
+        while(timeSinceLastUpdate > TimePerFrame) {
+            timeSinceLastUpdate -= TimePerFrame;
+            repaint = true;
+            update(TimePerFrame);
+        }
+        update(timeSinceLastUpdate);
+        if(repaint) {
+            render();
+        }
+    }
+}
+
+// -------------------------------------------------- PLAYER METHODS --------------------------------------------------
+Player::Player() : _shape(sf::Vector2f(32, 32)) {
+    _shape.setFillColor(sf::Color::Blue);
+    _shape.setOrigin(16,16);
+}
+
+void Player::update(sf::Time deltaTime) {
+    float seconds = deltaTime.asSeconds();
+    if (rotation != 0) {
+        float angle = (rotation>0?1:-1)*180*seconds;
+        _shape.rotate(angle);
+    }
+    if(isMoving) {
+        float angle = _shape.getRotation() / 180 * M_PI - M_PI / 2;
+        _velocity += sf::Vector2(std::cos(angle), std::sin(angle)) * 60.0f * seconds;
+    }
+    _shape.move(seconds * _velocity);
+}
+
+// -------------------------------------------------- MAIN --------------------------------------------------
+int main(int argc, char* argv[]) {
+    Game game;
+    game.run(frames); // Run the game at 60 frames per second
 }

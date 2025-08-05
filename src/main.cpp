@@ -11,22 +11,6 @@
 
 const int frames = 30;
 
-// -------------------------------------------------- GAME CLASS --------------------------------------------------
-class Game {
-public:
-    Game(const Game&) = delete;
-    Game& operator=(const Game&) = delete;
-    Game();
-    void run(int frames_per_seconds);
-private:
-    void processEvents();
-    void update(sf::Time deltaTime);
-    void render();
-
-    sf::RenderWindow _window;
-    Player _player;
-};
-
 // -------------------------------------------------- PLAYER CLASS --------------------------------------------------
 class Player  : public sf::Drawable {
 public:
@@ -57,6 +41,23 @@ private:
     sf::Vector2f _velocity;
 };
 
+// -------------------------------------------------- GAME CLASS --------------------------------------------------
+class Game {
+public:
+    Game(const Game&) = delete;
+    Game& operator=(const Game&) = delete;
+    Game();
+    void run(int frames_per_seconds);
+private:
+    void processEvents();
+    void update(sf::Time deltaTime);
+    void render();
+
+    sf::RenderWindow _window;
+    Player _player;
+};
+
+
 // -------------------------------------------------- ACTION CLASS --------------------------------------------------
 class Action {
 public:
@@ -67,6 +68,9 @@ public:
     };
     Action (const sf::Keyboard::Key& key, int type = Type::RealTime|Type::Pressed);
     Action (const sf::Mouse::Button& button, int type = Type::RealTime|Type::Pressed);
+
+    Action(const Action& other); // <-- Add this line
+    Action& operator=(const Action& other); // <-- Add this line
 
     bool test() const;
     bool operator==(const sf::Event& event) const;

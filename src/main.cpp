@@ -173,6 +173,16 @@ Action& Action::operator=(const Action& other) {
     return *this;
 }
 
+Action::Action(const sf::Keyboard::Key& key, int type) : _type(type) {
+    _event.type = sf::Event::EventType::KeyPressed;
+    _event.key.code = key;
+}
+
+Action::Action(const sf::Mouse::Button& button, int type) : _type(type) {
+    _event.type = sf::Event::EventType::MouseButtonPressed;
+    _event.mouseButton.button = button;
+}
+
 // -------------------------------------------------- MAIN --------------------------------------------------
 int main(int argc, char* argv[]) {
     Game game;

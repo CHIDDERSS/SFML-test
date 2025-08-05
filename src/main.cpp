@@ -162,7 +162,7 @@ void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 
 // -------------------------------------------------- ACTION METHODS --------------------------------------------------
 
-/* copy action to another instance of action */
+/* copy action to another instance of action since no pointers in sf::Keyboard */
 Action::Action(const Action& other) : _type(other._type) {
     std::memcpy(&_event, &other._event, sizeof(sf::Event));
 }

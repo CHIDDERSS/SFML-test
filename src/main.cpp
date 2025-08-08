@@ -117,7 +117,7 @@ void Game::render() {
 void Game::run(int frames_per_second) {
     sf::Clock clock;
     sf::Time timeSinceLastUpdate = sf::Time::Zero;
-    sf::Time TimePerFrame = sf::seconds(1.f/frames_per_second);
+    sf::Time TimePerFrame = sf::seconds(1.0f/frames_per_second);
 
     while(_window.isOpen()) {
         processEvents();

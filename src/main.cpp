@@ -171,7 +171,7 @@ Action& Action::operator=(const Action& other) {
     std::memcpy(&_event, &other._event, sizeof(sf::Event));
     _type = other._type;
     return *this;
-}
+}   
 
 Action::Action(const sf::Keyboard::Key& key, int type) : _type(type) {
     _event.type = sf::Event::EventType::KeyPressed;
@@ -183,8 +183,21 @@ Action::Action(const sf::Mouse::Button& button, int type) : _type(type) {
     _event.mouseButton.button = button;
 }
 
+bool Action::operator==(const sf::Event& event) const {
+    bool res = false;
+    switch(event.type) {
+        case sf::Event::EventType::KeyPressed: 
+        {
+            if (_type& Type::Pressed && _event.type == sf::Event::EventType::KeyPressed)
+            res = event.key.code == _event.key.code;
+        } break;
+        case sf::Event::EventType::KeyReleased:
+            
+    }
+}
+
 // -------------------------------------------------- MAIN --------------------------------------------------
 int main(int argc, char* argv[]) {
     Game game;
     game.run(frames); // Run the game at 60 frames per second
-}
+}           

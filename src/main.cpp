@@ -80,6 +80,20 @@ private:
     sf::Vector2f _velocity;
 };
 
+template<typename T = int>
+class ActionMap {
+public:
+    ActionMap(const ActionMap<T>& ) = delete;
+    ActionMap<T>& operator=(const ActionMap<T>&) = delete;
+
+    ActionMap() = default;
+
+    void map(const T& key, const Action& action);
+    const Action& get(const T& key) const;
+private:
+    std::unordered_map<T, Action> _map;
+};
+
 // -------------------------------------------------- GAME CLASS --------------------------------------------------
 class Game {
 public:
@@ -219,12 +233,14 @@ bool Action::operator==(const sf::Event& event) const {
         {
             if (_type & Type::Pressed && _event.type == sf::Event::EventType::KeyPressed)
                 res = event.key.code == _event.key.code;
+                std::cout << "Key Pressed! \n";
         }
         break;
         case sf::Event::EventType::KeyReleased:
         {
             if(_type & Type::Released && _event.type == sf::Event::EventType::KeyPressed) {
                 res = event.key.code == _event.key.code;
+                std::cout << "Key Released! \n";
             }
         }
         case sf::Event::EventType::MouseButtonPressed:
@@ -307,6 +323,16 @@ void ActionTarget::unbind(const Action& action) {
     } else {
         _eventPoll.remove_if(remove_func);
     }
+}
+
+template<typename T>
+void ActionMap<T>::map(const T& key, const Action& action) {
+    _map.emplace(key, action);
+}
+
+template<typename T>
+const Action& ActionMap<T>::get(const T& key) const {
+    return _map.at(key);
 }
 
 // -------------------------------------------------- MAIN --------------------------------------------------

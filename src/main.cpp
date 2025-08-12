@@ -24,8 +24,8 @@ public:
     Action (const sf::Keyboard::Key& key, int type = Type::RealTime|Type::Pressed);
     Action (const sf::Mouse::Button& button, int type = Type::RealTime|Type::Pressed);
 
-    Action(const Action& other); // <-- Add this line
-    Action& operator=(const Action& other); // <-- Add this line
+    Action(const Action& other); 
+    Action& operator=(const Action& other); 
 
     bool test() const;
     bool operator==(const sf::Event& event) const;
@@ -37,10 +37,11 @@ private:
     int _type;
 };
 
+template<typename T = int>
 class ActionTarget {
 public:
     using FuncType = std::function<void(const sf::Event&)>;
-    ActionTarget();
+    ActionTarget<T>& operator=(const ActionMap<T>& map);
 
     bool processEvent(const sf::Event& event) const;
     void processEvents();
@@ -51,6 +52,8 @@ public:
 private:
     std::list<std::pair<Action, FuncType>> _eventRealTime;
     std::list<std::pair<Action, FuncType>> _eventPoll;
+
+    const ActionMap<T>& _actionMap;
 };
 
 // -------------------------------------------------- PLAYER CLASS --------------------------------------------------

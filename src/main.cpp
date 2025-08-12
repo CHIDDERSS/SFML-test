@@ -6,6 +6,7 @@
 #include <cstring>
 #include <list>
 #include <functional>
+#include <unordered_map>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -37,11 +38,11 @@ private:
     int _type;
 };
 
-template<typename T = int>
 class ActionTarget {
 public:
     using FuncType = std::function<void(const sf::Event&)>;
-    ActionTarget<T>& operator=(const ActionMap<T>& map);
+
+    ActionTarget();
 
     bool processEvent(const sf::Event& event) const;
     void processEvents();
@@ -52,8 +53,6 @@ public:
 private:
     std::list<std::pair<Action, FuncType>> _eventRealTime;
     std::list<std::pair<Action, FuncType>> _eventPoll;
-
-    const ActionMap<T>& _actionMap;
 };
 
 // -------------------------------------------------- PLAYER CLASS --------------------------------------------------
@@ -194,7 +193,7 @@ void Player::update(sf::Time deltaTime) {
     }
     if(_isMoving) {
         float angle = _shape.getRotation() / 180 * M_PI - M_PI / 2;
-        _velocity += sf::Vector2(std::cos(angle), std::sin(angle)) * 60.0f * seconds;
+        _velocity += sf::Vector2f(std::cos(angle), std::sin(angle)) * 60.0f * seconds;
     }
     _shape.move(seconds * _velocity);
 
@@ -246,6 +245,7 @@ bool Action::operator==(const sf::Event& event) const {
                 std::cout << "Key Released! \n";
             }
         }
+        break;
         case sf::Event::EventType::MouseButtonPressed:
         {
             if(_type & Type::Pressed && _event.type == sf::Event::EventType::MouseButtonPressed) {
@@ -253,6 +253,7 @@ bool Action::operator==(const sf::Event& event) const {
                 std::cout << "MOUSE BUTTON PRESSED! \n";
             }
         }
+        break;
         case sf::Event::EventType::MouseButtonReleased:
         {
             if(_type & Type::Released && _event.type == sf::Event::EventType::MouseButtonReleased) {
@@ -274,11 +275,10 @@ bool Action::test () const {
     if (_event.type == sf::Event::EventType::KeyPressed) {
         if (_type & Type::Pressed) {
             res = sf::Keyboard::isKeyPressed(_event.key.code);
-        } else if (_event.type == sf::Event::EventType::MouseButtonPressed) {
-            if (_type & Type::Pressed) {
-                res = sf::Mouse::isButtonPressed(_event.mouseButton.button);
-            }
-            return res;
+        }
+    } else if (_event.type == sf::Event::EventType::MouseButtonPressed) {
+        if (_type & Type::Pressed) {
+            res = sf::Mouse::isButtonPressed(_event.mouseButton.button);
         }
     }
     return res;

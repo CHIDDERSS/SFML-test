@@ -37,7 +37,6 @@ private:
     sf::Event _event;
     int _type;
 };
-template <typename T = int>
 class ActionTarget {
 public:
     using FuncType = std::function<void(const sf::Event&)>;
@@ -53,8 +52,6 @@ public:
 private:
     std::list<std::pair<Action, FuncType>> _eventRealTime;
     std::list<std::pair<Action, FuncType>> _eventPoll;
-
-    const ActionMap<T>& _actionMap;
 };
 
 // -------------------------------------------------- PLAYER CLASS --------------------------------------------------
@@ -284,10 +281,6 @@ bool Action::test () const {
         }
     }
     return res;
-}
-
-ActionTarget::ActionTarget() {
-
 }
 
 bool ActionTarget::processEvent(const sf::Event& event) const {
